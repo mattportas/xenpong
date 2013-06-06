@@ -50,6 +50,8 @@ AddDevice(
     pdx->DeviceObject = DeviceObject;
     pdx->Pdo = pdo;
 
+    pdx->LowerDeviceObject = IoAttachDeviceToDeviceStack(DeviceObject, pdo);
+
     DeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
 
     return STATUS_SUCCESS;
