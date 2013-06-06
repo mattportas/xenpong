@@ -17,10 +17,4 @@ DRIVER_INITIALIZE DriverEntry;
 DRIVER_UNLOAD DriverUnload;
 DRIVER_ADD_DEVICE AddDevice;
 
-NTSTATUS
-AddDevice(
-    PDRIVER_OBJECT DriverObject,
-    PDEVICE_OBJECT pdo
-    );
-
 #endif  // _XENIFACE_H_
