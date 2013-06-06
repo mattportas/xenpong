@@ -73,6 +73,8 @@ DispatchPnp(
     MinorFunction = StackLocation->MinorFunction;
     pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
 
+    Warning("IRP ID = %d.\n", StackLocation->MinorFunction);
+
     switch (StackLocation->MinorFunction) {
         default:
             IoSkipCurrentIrpStackLocation(Irp);
