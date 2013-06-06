@@ -1,0 +1,26 @@
+#if !defined(_XENIFACE_H_)
+#define _XENIFACE_H_
+
+#include <ntddk.h>
+
+#pragma warning(disable:4100 4057)
+
+typedef struct _DEVICE_EXTENSION {
+    PDEVICE_OBJECT DeviceObject;
+    PDEVICE_OBJECT LowerDeviceObject;
+    PDEVICE_OBJECT Pdo;
+    UNICODE_STRING ifname;
+    IO_REMOVE_LOCK RemoveLock;
+} DEVICE_EXTENSION, *PDEVICE_EXTENSION;
+
+DRIVER_INITIALIZE DriverEntry;
+DRIVER_UNLOAD DriverUnload;
+DRIVER_ADD_DEVICE AddDevice;
+
+NTSTATUS
+AddDevice(
+    PDRIVER_OBJECT DriverObject,
+    PDEVICE_OBJECT pdo
+    );
+
+#endif  // _XENIFACE_H_
