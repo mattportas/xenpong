@@ -38,6 +38,7 @@ AddDevice(
     PDEVICE_EXTENSION pdx;
     NTSTATUS status;
 
+    Warning("New device added.\n");
     status = IoCreateDevice(DriverObject, sizeof(DEVICE_EXTENSION),
                             NULL, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN,
                             FALSE, &fdo);
