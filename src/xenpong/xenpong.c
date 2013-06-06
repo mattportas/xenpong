@@ -13,7 +13,7 @@ DriverEntry(
     __in PUNICODE_STRING RegistryPath
     )
 {
-    Warning("Initializing DriverObject.");
+    Warning("Initializing DriverObject.\n");
     DriverObject->DriverUnload = DriverUnload;
     DriverObject->DriverExtension->AddDevice = AddDevice;
     DriverObject->MajorFunction[IRP_MJ_PNP] = DispatchPnp;
@@ -66,7 +66,7 @@ DispatchPnp(
     UCHAR MinorFunction;
     NTSTATUS status;
 
-    Warning("Received an IRP.");
+    Warning("Received an IRP.\n");
     StackLocation = IoGetCurrentIrpStackLocation(Irp);
     MinorFunction = StackLocation->MinorFunction;
     pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
