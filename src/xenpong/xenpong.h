@@ -17,4 +17,7 @@ DRIVER_INITIALIZE DriverEntry;
 DRIVER_UNLOAD DriverUnload;
 DRIVER_ADD_DEVICE AddDevice;
 
+_Dispatch_type_(IRP_MJ_PNP)
+DRIVER_DISPATCH DispatchPnp;
+
 #endif  // _XENIFACE_H_

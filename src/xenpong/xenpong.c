@@ -16,6 +16,7 @@ DriverEntry(
     Warning("Initializing DriverObject.");
     DriverObject->DriverUnload = DriverUnload;
     DriverObject->DriverExtension->AddDevice = AddDevice;
+    DriverObject->MajorFunction[IRP_MJ_PNP] = DispatchPnp;
 
     return STATUS_SUCCESS;
 }
@@ -49,4 +50,30 @@ AddDevice(
     fdo->Flags &= ~DO_DEVICE_INITIALIZING;
 
     return STATUS_SUCCESS;
+}
+
+NTSTATUS
+DispatchPnp(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp
+    )
+{
+    PIO_STACK_LOCATION StackLocation;
+    PDEVICE_EXTENSION pdx;
+    UCHAR MinorFunction;
+    NTSTATUS status;
+
+    Warning("Received an IRP.");
+    StackLocation = IoGetCurrentIrpStackLocation(Irp);
+    MinorFunction = StackLocation->MinorFunction;
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+
+    switch (StackLocation->MinorFunction) {
+        default:
+            IoSkipCurrentIrpStackLocation(Irp);
+            status = IoCallDriver(pdx->LowerDeviceObject, Irp);
+            break;
+    }
+
+    return status;
 }
