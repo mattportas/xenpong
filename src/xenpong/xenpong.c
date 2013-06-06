@@ -34,23 +34,23 @@ AddDevice(
     PDEVICE_OBJECT pdo
     )
 {
-    PDEVICE_OBJECT fdo;
+    PDEVICE_OBJECT DeviceObject;
     PDEVICE_EXTENSION pdx;
     NTSTATUS status;
 
     Warning("New device added.\n");
     status = IoCreateDevice(DriverObject, sizeof(DEVICE_EXTENSION),
                             NULL, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN,
-                            FALSE, &fdo);
+                            FALSE, &DeviceObject);
     if (!NT_SUCCESS(status)) {
         return status;
     }
 
-    pdx = (PDEVICE_EXTENSION) fdo->DeviceExtension;
-    pdx->DeviceObject = fdo;
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+    pdx->DeviceObject = DeviceObject;
     pdx->Pdo = pdo;
 
-    fdo->Flags &= ~DO_DEVICE_INITIALIZING;
+    DeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
 
     return STATUS_SUCCESS;
 }
