@@ -73,10 +73,9 @@ DispatchPnp(
     MinorFunction = StackLocation->MinorFunction;
     pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
 
-    Warning("IRP ID = %d.\n", StackLocation->MinorFunction);
-
     switch (StackLocation->MinorFunction) {
         default:
+            Warning("IRP ID = %d.\n", StackLocation->MinorFunction);
             IoSkipCurrentIrpStackLocation(Irp);
             status = IoCallDriver(pdx->LowerDeviceObject, Irp);
             break;
