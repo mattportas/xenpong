@@ -20,4 +20,16 @@ DRIVER_ADD_DEVICE AddDevice;
 _Dispatch_type_(IRP_MJ_PNP)
 DRIVER_DISPATCH DispatchPnp;
 
+NTSTATUS
+StartDevice(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp
+    );
+
+NTSTATUS
+StopDevice(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp
+    );
+
 #endif  // _XENIFACE_H_
