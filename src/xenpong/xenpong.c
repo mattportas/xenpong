@@ -78,6 +78,10 @@ DispatchPnp(
             Warning("IRP_MN_START_DEVICE IRP received.\n");
             status = StartDevice(DeviceObject, Irp);
             break;
+        case IRP_MN_STOP_DEVICE:
+            Warning("IRP_MN_STOP_DEVICE IRP received.\n");
+            status = StopDevice(DeviceObject, Irp);
+            break;
         default:
             Warning("IRP ID = %d.\n", StackLocation->MinorFunction);
             IoSkipCurrentIrpStackLocation(Irp);
@@ -120,4 +124,23 @@ StartDevice(
     Irp->IoStatus.Status = STATUS_SUCCESS;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
     return STATUS_SUCCESS;
+}
+
+NTSTATUS
+StopDevice(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp
+    )
+{
+    PDEVICE_EXTENSION pdx;
+    NTSTATUS status;
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+
+    IoSkipCurrentIrpStackLocation(Irp);
+    status = IoCallDriver(pdx->LowerDeviceObject, Irp);
+
+    return status;
 }
