@@ -74,6 +74,10 @@ DispatchPnp(
     pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
 
     switch (StackLocation->MinorFunction) {
+        case IRP_MN_START_DEVICE:
+            Warning("IRP_MN_START_DEVICE IRP received.\n");
+            status = StartDevice(DeviceObject, Irp);
+            break;
         default:
             Warning("IRP ID = %d.\n", StackLocation->MinorFunction);
             IoSkipCurrentIrpStackLocation(Irp);
@@ -82,4 +86,38 @@ DispatchPnp(
     }
 
     return status;
+}
+
+NTSTATUS
+CompleteRoutine(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp,
+    __in PVOID Context
+    )
+{
+    return STATUS_MORE_PROCESSING_REQUIRED;
+}
+
+NTSTATUS
+StartDevice(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp
+    )
+{
+    PDEVICE_EXTENSION pdx;
+    NTSTATUS status;
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+    IoCopyCurrentIrpStackLocationToNext(Irp);
+    IoSetCompletionRoutine(Irp, CompleteRoutine, NULL, TRUE, TRUE, TRUE);
+    status = IoCallDriver(pdx->LowerDeviceObject, Irp);
+    if (!NT_SUCCESS(status)) {
+        Warning("IoCallDriver failed.\n");
+    } else {
+        Warning("IoCallDriver succeeded.\n");
+    }
+
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
 }
