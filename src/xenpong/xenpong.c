@@ -1,5 +1,11 @@
+#define INITGUID 1
+
+#include <ntddk.h>
+#include <wdm.h>
+
 #include "xenpong.h"
 #include "log.h"
+#include "store_interface.h"
 
 #define _DRIVER_NAME_ "XenPong"
 
@@ -51,6 +57,11 @@ AddDevice(
     pdx->Pdo = pdo;
 
     pdx->LowerDeviceObject = IoAttachDeviceToDeviceStack(DeviceObject, pdo);
+
+    status = QueryStoreInterface(DeviceObject);
+    if (!NT_SUCCESS(status)) {
+        return status;
+    }
 
     DeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
 
@@ -169,4 +180,67 @@ RemoveDevice(
     IoDeleteDevice(DeviceObject);
 
     return status;
+}
+
+NTSTATUS
+QueryStoreInterface(
+    __in PDEVICE_OBJECT DeviceObject
+    )
+{
+    INTERFACE Interface;
+    IO_STATUS_BLOCK StatusBlock;
+    KEVENT Event;
+    PDEVICE_EXTENSION pdx;
+    PIRP Irp;
+    PIO_STACK_LOCATION StackLocation;
+    NTSTATUS status;
+
+    Warning("Querying Xenstore Interface.\n");
+
+    ASSERT(KeGetCurrentIrql() == PASSIVE_LEVEL);
+    KeInitializeEvent(&Event, NotificationEvent, FALSE);
+    RtlZeroMemory(&StatusBlock, sizeof(IO_STATUS_BLOCK));
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+
+    Irp = IoBuildSynchronousFsdRequest(IRP_MJ_PNP,
+                                       pdx->LowerDeviceObject,
+                                       NULL,
+                                       0,
+                                       NULL,
+                                       &Event,
+                                       &StatusBlock);
+
+    if (Irp == NULL) {
+        Warning("Unable to build synchronous FSD request.\n");
+        return STATUS_UNSUCCESSFUL;
+    }
+
+    StackLocation = IoGetNextIrpStackLocation(Irp);
+    StackLocation->MinorFunction = IRP_MN_QUERY_INTERFACE;
+
+    StackLocation->Parameters.QueryInterface.InterfaceType = &GUID_STORE_INTERFACE;
+    StackLocation->Parameters.QueryInterface.Size = sizeof(INTERFACE);
+    StackLocation->Parameters.QueryInterface.Version = STORE_INTERFACE_VERSION;
+    StackLocation->Parameters.QueryInterface.Interface = &Interface;
+
+    Irp->IoStatus.Status = STATUS_NOT_SUPPORTED;
+
+    status = IoCallDriver(pdx->LowerDeviceObject, Irp);
+    if (status == STATUS_PENDING) {
+        (VOID) KeWaitForSingleObject(&Event,
+                                     Executive,
+                                     KernelMode,
+                                     FALSE,
+                                     NULL);
+        status = StatusBlock.Status;
+    }
+    if (!NT_SUCCESS(status)) {
+        Warning("Failed waiting on KEvent.\n");
+        return status;
+    }
+
+    pdx->StoreInterface = Interface.Context;
+
+    return STATUS_SUCCESS;
 }

@@ -3,6 +3,8 @@
 
 #include <ntddk.h>
 
+#include "store_interface.h"
+
 #pragma warning(disable:4100 4057)
 
 typedef struct _DEVICE_EXTENSION {
@@ -11,6 +13,7 @@ typedef struct _DEVICE_EXTENSION {
     PDEVICE_OBJECT Pdo;
     UNICODE_STRING ifname;
     IO_REMOVE_LOCK RemoveLock;
+    PXENBUS_STORE_INTERFACE StoreInterface;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 DRIVER_INITIALIZE DriverEntry;
@@ -36,6 +39,11 @@ NTSTATUS
 RemoveDevice(
     __in PDEVICE_OBJECT DeviceObject,
     __in PIRP Irp
+    );
+
+NTSTATUS
+QueryStoreInterface(
+    __in PDEVICE_OBJECT DeviceObject
     );
 
 #endif  // _XENIFACE_H_
