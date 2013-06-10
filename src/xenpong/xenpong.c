@@ -96,6 +96,7 @@ DispatchPnp(
     return status;
 }
 
+_Function_class_(IO_COMPLETION_ROUTINE)
 NTSTATUS
 CompleteRoutine(
     __in PDEVICE_OBJECT DeviceObject,
