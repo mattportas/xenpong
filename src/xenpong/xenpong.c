@@ -82,6 +82,10 @@ DispatchPnp(
             Warning("IRP_MN_STOP_DEVICE IRP received.\n");
             status = StopDevice(DeviceObject, Irp);
             break;
+        case IRP_MN_REMOVE_DEVICE:
+            Warning("IRP_MN_REMOVE_DEVICE IRP received.\n");
+            status = RemoveDevice(DeviceObject, Irp);
+            break;
         default:
             Warning("IRP ID = %d.\n", StackLocation->MinorFunction);
             IoSkipCurrentIrpStackLocation(Irp);
@@ -141,6 +145,27 @@ StopDevice(
 
     IoSkipCurrentIrpStackLocation(Irp);
     status = IoCallDriver(pdx->LowerDeviceObject, Irp);
+
+    return status;
+}
+
+NTSTATUS
+RemoveDevice(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp
+    )
+{
+    PDEVICE_EXTENSION pdx;
+    NTSTATUS status;
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+    IoSkipCurrentIrpStackLocation(Irp);
+    status = IoCallDriver(pdx->LowerDeviceObject, Irp);
+
+    IoDetachDevice(pdx->LowerDeviceObject);
+    IoDeleteDevice(DeviceObject);
 
     return status;
 }

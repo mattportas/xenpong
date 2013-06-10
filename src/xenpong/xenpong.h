@@ -32,4 +32,10 @@ StopDevice(
     __in PIRP Irp
     );
 
+NTSTATUS
+RemoveDevice(
+    __in PDEVICE_OBJECT DeviceObject,
+    __in PIRP Irp
+    );
+
 #endif  // _XENIFACE_H_
