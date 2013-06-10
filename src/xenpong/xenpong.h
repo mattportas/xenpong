@@ -3,6 +3,7 @@
 
 #include <ntddk.h>
 
+#include "evtchn_interface.h"
 #include "store_interface.h"
 
 #pragma warning(disable:4100 4057)
@@ -13,6 +14,7 @@ typedef struct _DEVICE_EXTENSION {
     PDEVICE_OBJECT Pdo;
     UNICODE_STRING ifname;
     IO_REMOVE_LOCK RemoveLock;
+    PXENBUS_EVTCHN_INTERFACE EvtchnInterface;
     PXENBUS_STORE_INTERFACE StoreInterface;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
@@ -43,6 +45,11 @@ RemoveDevice(
 
 NTSTATUS
 QueryStoreInterface(
+    __in PDEVICE_OBJECT DeviceObject
+    );
+
+NTSTATUS
+QueryEvtchnInterface(
     __in PDEVICE_OBJECT DeviceObject
     );
 
