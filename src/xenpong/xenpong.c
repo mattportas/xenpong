@@ -143,10 +143,14 @@ StartDevice(
         Warning("IoCallDriver succeeded.\n");
     }
 
+    Warning("Connecting to event channel.\n");
     status = ConnectEvtchnInterface(DeviceObject);
     if (!NT_SUCCESS(status)) {
         Warning("Failed to connect to event channel.\n");
     }
+
+    Warning("Sending event channel notify.\n");
+    status = SendEvtchnNotify(DeviceObject);
 
     Irp->IoStatus.Status = status;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
@@ -327,7 +331,11 @@ EvtchnCallback(
     __in PVOID Argument
     )
 {
-    return TRUE;
+    PDEVICE_EXTENSION pdx = Argument;
+
+    Warning("Event Callback.\n");
+
+    return NT_SUCCESS(SendEvtchnNotify(pdx->DeviceObject));
 }
 
 NTSTATUS
@@ -338,17 +346,18 @@ ConnectEvtchnInterface(
     BOOLEAN pending;
     PDEVICE_EXTENSION pdx;
 
-    Warning("Connecting to Event Channel.\n");
     pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+    Warning("Acquring event channel.\n");
     EVTCHN(Acquire, pdx->EvtchnInterface);
 
+    Warning("Opening event channel.\n");
     pdx->Evtchn = EVTCHN(Open,
                          pdx->EvtchnInterface,
                          EVTCHN_INTER_DOMAIN,
                          EvtchnCallback,
                          pdx,
                          0,
-                         53,
+                         50,
                          FALSE);
 
     if (pdx->Evtchn == NULL) {
@@ -357,16 +366,34 @@ ConnectEvtchnInterface(
         return STATUS_UNSUCCESSFUL;
     }
 
+    Warning("Unmasking event channel.\n");
     pending = EVTCHN(Unmask,
                      pdx->EvtchnInterface,
                      pdx->Evtchn,
                      FALSE);
 
     if (pending) {
+        Warning("Handling pending event trigger.\n");
         EVTCHN(Trigger,
                pdx->EvtchnInterface,
                pdx->Evtchn);
     }
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS
+SendEvtchnNotify(
+    __in PDEVICE_OBJECT DeviceObject
+    )
+{
+    PDEVICE_EXTENSION pdx;
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+
+    (VOID) EVTCHN(Send,
+                  pdx->EvtchnInterface,
+                  pdx->Evtchn);
 
     return STATUS_SUCCESS;
 }
