@@ -143,9 +143,14 @@ StartDevice(
         Warning("IoCallDriver succeeded.\n");
     }
 
-    Irp->IoStatus.Status = STATUS_SUCCESS;
+    status = ConnectEvtchnInterface(DeviceObject);
+    if (!NT_SUCCESS(status)) {
+        Warning("Failed to connect to event channel.\n");
+    }
+
+    Irp->IoStatus.Status = status;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
-    return STATUS_SUCCESS;
+    return status;
 }
 
 NTSTATUS
@@ -311,6 +316,57 @@ QueryEvtchnInterface(
     }
 
     pdx->EvtchnInterface = Interface.Context;
+
+    return STATUS_SUCCESS;
+}
+
+_Function_class_(KSERVICE_ROUTINE)
+BOOLEAN
+EvtchnCallback(
+    __in PKINTERRUPT InterruptObject,
+    __in PVOID Argument
+    )
+{
+    return TRUE;
+}
+
+NTSTATUS
+ConnectEvtchnInterface(
+    __in PDEVICE_OBJECT DeviceObject
+    )
+{
+    BOOLEAN pending;
+    PDEVICE_EXTENSION pdx;
+
+    Warning("Connecting to Event Channel.\n");
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+    EVTCHN(Acquire, pdx->EvtchnInterface);
+
+    pdx->Evtchn = EVTCHN(Open,
+                         pdx->EvtchnInterface,
+                         EVTCHN_INTER_DOMAIN,
+                         EvtchnCallback,
+                         pdx,
+                         0,
+                         53,
+                         FALSE);
+
+    if (pdx->Evtchn == NULL) {
+        Warning("Failed to open eventchannel.\n");
+        EVTCHN(Release, pdx->EvtchnInterface);
+        return STATUS_UNSUCCESSFUL;
+    }
+
+    pending = EVTCHN(Unmask,
+                     pdx->EvtchnInterface,
+                     pdx->Evtchn,
+                     FALSE);
+
+    if (pending) {
+        EVTCHN(Trigger,
+               pdx->EvtchnInterface,
+               pdx->Evtchn);
+    }
 
     return STATUS_SUCCESS;
 }

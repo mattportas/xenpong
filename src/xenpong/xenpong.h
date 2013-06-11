@@ -15,6 +15,7 @@ typedef struct _DEVICE_EXTENSION {
     UNICODE_STRING ifname;
     IO_REMOVE_LOCK RemoveLock;
     PXENBUS_EVTCHN_INTERFACE EvtchnInterface;
+    PXENBUS_EVTCHN_DESCRIPTOR Evtchn;
     PXENBUS_STORE_INTERFACE StoreInterface;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
@@ -50,6 +51,11 @@ QueryStoreInterface(
 
 NTSTATUS
 QueryEvtchnInterface(
+    __in PDEVICE_OBJECT DeviceObject
+    );
+
+NTSTATUS
+ConnectEvtchnInterface(
     __in PDEVICE_OBJECT DeviceObject
     );
 
