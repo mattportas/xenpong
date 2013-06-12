@@ -14,9 +14,12 @@ typedef struct _DEVICE_EXTENSION {
     PDEVICE_OBJECT Pdo;
     UNICODE_STRING ifname;
     IO_REMOVE_LOCK RemoveLock;
+    ULONG RemoteId;
+    ULONG RemotePort;
     PXENBUS_EVTCHN_INTERFACE EvtchnInterface;
     PXENBUS_EVTCHN_DESCRIPTOR Evtchn;
     PXENBUS_STORE_INTERFACE StoreInterface;
+    PXENBUS_STORE_WATCH Watch;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 DRIVER_INITIALIZE DriverEntry;
@@ -61,6 +64,11 @@ ConnectEvtchnInterface(
 
 NTSTATUS
 SendEvtchnNotify(
+    __in PDEVICE_OBJECT DeviceObject
+    );
+
+NTSTATUS
+ReadChnFromStore(
     __in PDEVICE_OBJECT DeviceObject
     );
 

@@ -2,6 +2,7 @@
 
 #include <ntddk.h>
 #include <wdm.h>
+#include <stdlib.h>
 
 #include "xenpong.h"
 #include "log.h"
@@ -142,6 +143,11 @@ StartDevice(
     } else {
         Warning("IoCallDriver succeeded.\n");
     }
+
+    Warning("Watching store for /vmping.\n");
+    status = ReadChnFromStore(DeviceObject);
+    Warning("RemoteId = %d\n", pdx->RemoteId);
+    Warning("RemotePort = %d\n", pdx->RemotePort);
 
     Warning("Connecting to event channel.\n");
     status = ConnectEvtchnInterface(DeviceObject);
@@ -356,8 +362,8 @@ ConnectEvtchnInterface(
                          EVTCHN_INTER_DOMAIN,
                          EvtchnCallback,
                          pdx,
-                         0,
-                         50,
+                         pdx->RemoteId,
+                         pdx->RemotePort,
                          FALSE);
 
     if (pdx->Evtchn == NULL) {
@@ -394,6 +400,65 @@ SendEvtchnNotify(
     (VOID) EVTCHN(Send,
                   pdx->EvtchnInterface,
                   pdx->Evtchn);
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS
+ReadChnFromStore(
+    __in PDEVICE_OBJECT DeviceObject
+    )
+{
+    PDEVICE_EXTENSION pdx;
+    PCHAR Buffer;
+    ULONG DomId;
+    ULONG Port;
+    NTSTATUS status;
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+
+    Warning("Reading from Store.\n");
+    for (;;) {
+
+        STORE(Acquire, pdx->StoreInterface);
+
+        status = STORE(Read,
+                       pdx->StoreInterface,
+                       NULL,
+                       "vmping",
+                       "domid",
+                       &Buffer);
+
+        if (!NT_SUCCESS(status)) {
+            STORE(Release, pdx->StoreInterface);
+            continue;
+        }
+
+        Warning("Read vmping/domid.\n");
+        DomId = strtoul(Buffer, NULL, 10);
+        STORE(Free, pdx->StoreInterface, Buffer);
+
+        status = STORE(Read,
+                       pdx->StoreInterface,
+                       NULL,
+                       "vmping",
+                       "port",
+                       &Buffer);
+        if (!NT_SUCCESS(status)) {
+            STORE(Release, pdx->StoreInterface);
+            continue;
+        }
+
+        Warning("Read vmping/port.\n");
+        Port = strtoul(Buffer, NULL, 10);
+        STORE(Free, pdx->StoreInterface, Buffer);
+
+        STORE(Release, pdx->StoreInterface);
+        break;
+    }
+
+    pdx->RemoteId = DomId;
+    pdx->RemotePort = Port;
 
     return STATUS_SUCCESS;
 }
