@@ -195,6 +195,11 @@ RemoveDevice(
 
     pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
 
+    status = DisconnectEvtchnInterface(DeviceObject);
+
+    pdx->StoreInterface = NULL;
+    pdx->EvtchnInterface = NULL;
+
     Irp->IoStatus.Status = STATUS_SUCCESS;
     IoSkipCurrentIrpStackLocation(Irp);
     status = IoCallDriver(pdx->LowerDeviceObject, Irp);
