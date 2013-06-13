@@ -63,6 +63,11 @@ ConnectEvtchnInterface(
     );
 
 NTSTATUS
+DisconnectEvtchnInterface(
+    __in PDEVICE_OBJECT DeviceObject
+    );
+
+NTSTATUS
 SendEvtchnNotify(
     __in PDEVICE_OBJECT DeviceObject
     );

@@ -174,6 +174,8 @@ StopDevice(
 
     pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
 
+    status = DisconnectEvtchnInterface(DeviceObject);
+
     Irp->IoStatus.Status = STATUS_SUCCESS;
 
     IoSkipCurrentIrpStackLocation(Irp);
@@ -384,6 +386,27 @@ ConnectEvtchnInterface(
                pdx->EvtchnInterface,
                pdx->Evtchn);
     }
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS
+DisconnectEvtchnInterface(
+    __in PDEVICE_OBJECT DeviceObject
+    )
+{
+    PDEVICE_EXTENSION pdx;
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
+
+    Warning("Closing event channel.\n");
+    EVTCHN(Close,
+           pdx->EvtchnInterface,
+           pdx->Evtchn);
+    pdx->Evtchn = NULL;
+
+    EVTCHN(Release, pdx->EvtchnInterface);
+    pdx->EvtchnInterface = NULL;
 
     return STATUS_SUCCESS;
 }
