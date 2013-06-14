@@ -7,3 +7,6 @@
 /proj/xenpong/x64
 /proj/xenpong/WindowsVistaRelease
 /src/xenpong/*.swp
+*~
+*.sdf
+*.suo
