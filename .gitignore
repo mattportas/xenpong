@@ -1,11 +1,14 @@
 /xenpong.tar
 /xenpong
 /proj/WindowsVistaRelease
+/proj/WindowsVistaDebug
 /proj/x64
 /proj/package/x64
 /proj/package/WindowsVistaRelease
+/proj/package/WindowsVistaDebug
 /proj/xenpong/x64
 /proj/xenpong/WindowsVistaRelease
+/proj/xenpong/WindowsVistaDebug
 /src/xenpong/*.swp
 *~
 *.sdf
