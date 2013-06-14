@@ -7,46 +7,6 @@ import glob
 import tarfile
 import subprocess
 
-def get_expired_symbols(age = 30):
-    path = os.path.join(os.environ['SYMBOL_SERVER'], '000Admin\\history.txt')
-
-    try:
-        file = open(path, 'r')
-    except IOError:
-        return []
-
-    threshold = datetime.datetime.utcnow() - datetime.timedelta(days = age)
-
-    expired = []
-
-    for line in file:
-        item = line.split(',')
-
-        if (re.match('add', item[1])):
-            id = item[0]
-            date = item[3].split('/')
-            time = item[4].split(':')
-
-            age = datetime.datetime(year = int(date[2]),
-                                    month = int(date[0]),
-                                    day = int(date[1]),
-                                    hour = int(time[0]),
-                                    minute = int(time[1]),
-                                    second = int(time[2]))
-            if (age < threshold):
-                expired.append(id)
-
-        elif (re.match('del', item[1])):
-            id = item[2].rstrip()
-            try:
-                expired.remove(id)
-            except ValueError:
-                pass
-
-    file.close()
-
-    return expired
-
 def get_configuration_name(debug):
     configuration = 'WindowsVista'
 
@@ -117,62 +77,6 @@ def msbuild(name, arch, debug):
         raise msbuild_failure(configuration)
 
 
-def symstore_del(age):
-    symstore_path = [os.environ['KIT'], 'Debuggers']
-    if os.environ['PROCESSOR_ARCHITECTURE'] == 'x86':
-        symstore_path.append('x86')
-    else:
-        symstore_path.append('x64')
-    symstore_path.append('symstore.exe')
-
-    symstore = os.path.join(*symstore_path)
-
-    for id in get_expired_symbols(age):
-        command=['"' + symstore + '"']
-        command.append('del')
-        command.append('/i')
-        command.append(str(id))
-        command.append('/s')
-        command.append(os.environ['SYMBOL_SERVER'])
-
-        shell(' '.join(command))
-
-def symstore_add(name, arch, debug):
-    cwd = os.getcwd()
-    configuration = get_configuration_name(debug)
-    target_path = get_target_path(arch, debug)
-
-    symstore_path = [os.environ['KIT'], 'Debuggers']
-    if os.environ['PROCESSOR_ARCHITECTURE'] == 'x86':
-        symstore_path.append('x86')
-    else:
-        symstore_path.append('x64')
-    symstore_path.append('symstore.exe')
-
-    symstore = os.path.join(*symstore_path)
-
-    version = '.'.join([os.environ['MAJOR_VERSION'],
-                        os.environ['MINOR_VERSION'],
-                        os.environ['MICRO_VERSION'],
-                        os.environ['BUILD_NUMBER']])
-
-    os.chdir(target_path)
-    command=['"' + symstore + '"']
-    command.append('add')
-    command.append('/s')
-    command.append(os.environ['SYMBOL_SERVER'])
-    command.append('/r')
-    command.append('/f')
-    command.append('*.pdb')
-    command.append('/t')
-    command.append(name)
-    command.append('/v')
-    command.append(version)
-
-    shell(' '.join(command))
-
-    os.chdir(cwd)
-
 def callfnout(cmd):
     print(cmd)
 
@@ -214,14 +118,8 @@ if __name__ == '__main__':
 
     debug = { 'checked': True, 'free': False }
 
-    symstore_del(30)
-
     msbuild('xenpong', 'x86', debug[sys.argv[1]])
     msbuild('xenpong', 'x64', debug[sys.argv[1]])
-
-#    symstore_add('xeniface', 'x86', debug[sys.argv[1]])
-#    symstore_add('xeniface', 'x64', debug[sys.argv[1]])
-
 
 
 #    listfile = callfnout(['hg','manifest'])
