@@ -7,39 +7,6 @@ import glob
 import tarfile
 import subprocess
 
-def make_header():
-    now = datetime.datetime.now()
-
-    file = open('include\\version.h', 'w')
-    file.write('#define MAJOR_VERSION\t' + os.environ['MAJOR_VERSION'] + '\n')
-    file.write('#define MAJOR_VERSION_STR\t"' + os.environ['MAJOR_VERSION'] + '"\n')
-    file.write('\n')
-
-    file.write('#define MINOR_VERSION\t' + os.environ['MINOR_VERSION'] + '\n')
-    file.write('#define MINOR_VERSION_STR\t"' + os.environ['MINOR_VERSION'] + '"\n')
-    file.write('\n')
-
-    file.write('#define MICRO_VERSION\t' + os.environ['MICRO_VERSION'] + '\n')
-    file.write('#define MICRO_VERSION_STR\t"' + os.environ['MICRO_VERSION'] + '"\n')
-    file.write('\n')
-
-    file.write('#define BUILD_NUMBER\t' + os.environ['BUILD_NUMBER'] + '\n')
-    file.write('#define BUILD_NUMBER_STR\t"' + os.environ['BUILD_NUMBER'] + '"\n')
-    file.write('\n')
-
-    file.write('#define YEAR\t' + str(now.year) + '\n')
-    file.write('#define YEAR_STR\t"' + str(now.year) + '"\n')
-
-    file.write('#define MONTH\t' + str(now.month) + '\n')
-    file.write('#define MONTH_STR\t"' + str(now.month) + '"\n')
-
-    file.write('#define DAY\t' + str(now.day) + '\n')
-    file.write('#define DAY_STR\t"' + str(now.day) + '"\n')
-
-
-    file.close()
-
-
 def get_expired_symbols(age = 30):
     path = os.path.join(os.environ['SYMBOL_SERVER'], '000Admin\\history.txt')
 
@@ -246,8 +213,6 @@ if __name__ == '__main__':
         revision.close()
 
     debug = { 'checked': True, 'free': False }
-
-    make_header()
 
     symstore_del(30)
 
