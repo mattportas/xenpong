@@ -3,6 +3,11 @@
 
 #include <ntddk.h>
 
+typedef struct _XENPONG_THREAD {
+    PVOID Context;
+    KEVENT Event;
+    PKTHREAD Thread;
+} XENPONG_THREAD, *PXENPONG_THREAD;
 
 _Function_class_(KSTART_ROUTINE)
 VOID

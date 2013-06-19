@@ -3,6 +3,7 @@
 
 #include <ntddk.h>
 
+#include "thread.h"
 #include "evtchn_interface.h"
 #include "store_interface.h"
 
@@ -20,6 +21,8 @@ typedef struct _DEVICE_EXTENSION {
     PXENBUS_EVTCHN_DESCRIPTOR Evtchn;
     PXENBUS_STORE_INTERFACE StoreInterface;
     PXENBUS_STORE_WATCH Watch;
+    PXENPONG_THREAD StoreThread;
+    PXENPONG_THREAD EvtchnThread;
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 DRIVER_INITIALIZE DriverEntry;
