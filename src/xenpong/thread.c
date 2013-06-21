@@ -2,8 +2,10 @@
 #include <wdm.h>
 
 #include "thread.h"
+#include "store.h"
 #include "log.h"
 #include "util.h"
+#include "xenpong.h"
 
 #define THREAD_POOL 'ERHT'
 
@@ -21,9 +23,19 @@ StoreThreadFunction(
     __in PVOID Argument
     )
 {
-    UNREFERENCED_PARAMETER(Argument);
+    PXENPONG_THREAD StoreThread = Argument;
+    PDEVICE_OBJECT DeviceObject = StoreThread->Context;
+    PDEVICE_EXTENSION pdx;
+
+    pdx = (PDEVICE_EXTENSION) DeviceObject->DeviceExtension;
 
     Warning("StoreThread function.\n");
+
+    Warning("Watching store for /vmping.\n");
+    ReadChnFromStore(DeviceObject);
+
+    Warning("RemoteId = %d\n", pdx->RemoteId);
+    Warning("RemotePort = %d\n", pdx->RemotePort);
 
     PsTerminateSystemThread(STATUS_SUCCESS);
 }
