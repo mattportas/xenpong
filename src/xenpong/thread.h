@@ -29,6 +29,8 @@ EvtchnThreadFunction(
 
 NTSTATUS
 EvtchnThreadCreate(
+    __in PDEVICE_OBJECT DeviceObject,
+    __out PXENPONG_THREAD *EvtchnThread
     );
 
 #endif // _THREAD_H_

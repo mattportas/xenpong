@@ -77,11 +77,17 @@ EvtchnThreadFunction(
 
 NTSTATUS
 EvtchnThreadCreate(
+    __in PDEVICE_OBJECT DeviceObject,
+    __out PXENPONG_THREAD *EvtchnThread
     )
 {
     HANDLE Handle;
-    PKTHREAD Thread;
     NTSTATUS status;
+
+    (*EvtchnThread) = __ThreadAlloacte(sizeof (XENPONG_THREAD));
+    (*EvtchnThread)->Context = DeviceObject;
+
+    KeInitializeEvent(&(*EvtchnThread)->Event, NotificationEvent, FALSE);
 
     status = PsCreateSystemThread(&Handle,
                                   STANDARD_RIGHTS_ALL | SPECIFIC_RIGHTS_ALL,
@@ -89,7 +95,7 @@ EvtchnThreadCreate(
                                   NULL,
                                   NULL,
                                   EvtchnThreadFunction,
-                                  NULL);
+                                  *EvtchnThread);
     if (!NT_SUCCESS(status)) {
         return status;
     }
@@ -98,7 +104,7 @@ EvtchnThreadCreate(
                                        SYNCHRONIZE,
                                        *PsThreadType,
                                        KernelMode,
-                                       &Thread,
+                                       &(*EvtchnThread)->Thread,
                                        NULL);
 
     ZwClose(Handle);
