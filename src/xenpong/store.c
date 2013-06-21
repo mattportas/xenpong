@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "log.h"
+#include "thread.h"
 #include "store.h"
 #include "store_interface.h"
 #include "xenpong.h"
@@ -18,6 +19,7 @@ ReadChnFromStore(
     PCHAR Buffer;
     ULONG DomId;
     ULONG Port;
+    PXENPONG_THREAD EvtchnThread;
     NTSTATUS status;
 
     ASSERT(KeGetCurrentIrql() <= DISPATCH_LEVEL);
@@ -71,6 +73,10 @@ ReadChnFromStore(
         KeCancelTimer(&Timer);
 
         STORE(Release, pdx->StoreInterface);
+
+        EvtchnThread = pdx->EvtchnThread;
+        KeSetEvent(&EvtchnThread->Event, IO_NO_INCREMENT, FALSE);
+
         break;
     }
 
