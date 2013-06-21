@@ -72,9 +72,4 @@ SendEvtchnNotify(
     __in PDEVICE_OBJECT DeviceObject
     );
 
-NTSTATUS
-ReadChnFromStore(
-    __in PDEVICE_OBJECT DeviceObject
-    );
-
 #endif  // _XENIFACE_H_
