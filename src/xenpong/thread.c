@@ -3,6 +3,17 @@
 
 #include "thread.h"
 #include "log.h"
+#include "util.h"
+
+#define THREAD_POOL 'ERHT'
+
+static FORCEINLINE PVOID
+__ThreadAlloacte(
+    __in ULONG Length
+    )
+{
+    return __AllocateNonPagedPoolWithTag(Length, THREAD_POOL);
+}
 
 _Function_class_(KSTART_ROUTINE)
 VOID
