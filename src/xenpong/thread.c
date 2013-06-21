@@ -3,6 +3,7 @@
 
 #include "thread.h"
 #include "store.h"
+#include "evtchn.h"
 #include "log.h"
 #include "util.h"
 #include "xenpong.h"
@@ -83,7 +84,26 @@ EvtchnThreadFunction(
     __in PVOID Argument
     )
 {
-    UNREFERENCED_PARAMETER(Argument);
+    PXENPONG_THREAD EvtchnThread = Argument;
+    PDEVICE_OBJECT DeviceObject = EvtchnThread->Context;
+    NTSTATUS status;
+
+    Warning("Waiting for evtchn event to be signaled.\n");
+    (VOID) KeWaitForSingleObject(&EvtchnThread->Event,
+                                 Executive,
+                                 KernelMode,
+                                 FALSE,
+                                 NULL);
+
+    Warning("Evtchn event signaled.\n");
+    status = ConnectEvtchnInterface(DeviceObject);
+    if (NT_SUCCESS(status)) {
+        Warning("Connected to event channel. Sending notification.\n");
+        SendEvtchnNotify(DeviceObject);
+    } else {
+        Warning("Failed to connect to Event channel.\n");
+    }
+
     PsTerminateSystemThread(STATUS_SUCCESS);
 }
 
