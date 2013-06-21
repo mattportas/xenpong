@@ -57,19 +57,4 @@ QueryEvtchnInterface(
     __in PDEVICE_OBJECT DeviceObject
     );
 
-NTSTATUS
-ConnectEvtchnInterface(
-    __in PDEVICE_OBJECT DeviceObject
-    );
-
-NTSTATUS
-DisconnectEvtchnInterface(
-    __in PDEVICE_OBJECT DeviceObject
-    );
-
-NTSTATUS
-SendEvtchnNotify(
-    __in PDEVICE_OBJECT DeviceObject
-    );
-
 #endif  // _XENIFACE_H_

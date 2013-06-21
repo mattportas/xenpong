@@ -190,6 +190,7 @@
     <ClCompile Include="..\..\src\xenpong\log.c" />
     <ClCompile Include="..\..\src\xenpong\xenpong.c" />
     <ClCompile Include="..\..\src\xenpong\store.c" />
+    <ClCompile Include="..\..\src\xenpong\evtchn.c" />
   </ItemGroup>
   <ItemGroup>
     <Inf Include="..\..\src\xenpong.inf" />
