@@ -10,6 +10,7 @@
 #include "evtchn_interface.h"
 #include "store.h"
 #include "evtchn.h"
+#include "thread.h"
 
 #define _DRIVER_NAME_ "XenPong"
 
@@ -146,19 +147,19 @@ StartDevice(
         Warning("IoCallDriver succeeded.\n");
     }
 
-    Warning("Watching store for /vmping.\n");
-    status = ReadChnFromStore(DeviceObject);
-    Warning("RemoteId = %d\n", pdx->RemoteId);
-    Warning("RemotePort = %d\n", pdx->RemotePort);
-
-    Warning("Connecting to event channel.\n");
-    status = ConnectEvtchnInterface(DeviceObject);
+    Warning("Creating Event Channel Thread.\n");
+    status = EvtchnThreadCreate(DeviceObject, &pdx->EvtchnThread);
     if (!NT_SUCCESS(status)) {
-        Warning("Failed to connect to event channel.\n");
+        Warning("Failed to create Event Channel thread.\n");
+        return status;
     }
 
-    Warning("Sending event channel notify.\n");
-    status = SendEvtchnNotify(DeviceObject);
+    Warning("Creating Store Thread.\n");
+    status = StoreThreadCreate(DeviceObject, &pdx->StoreThread);
+    if (!NT_SUCCESS(status)) {
+        Warning("Failed to create Store thread.\n");
+        return status;
+    }
 
     Irp->IoStatus.Status = status;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
