@@ -17,7 +17,8 @@ StoreThreadFunction(
 
 NTSTATUS
 StoreThreadCreate(
-    __in PDEVICE_OBJECT DeviceObject
+    __in PDEVICE_OBJECT DeviceObject,
+    __out PXENPONG_THREAD *Thread
     );
 
 _Function_class_(KSTART_ROUTINE)

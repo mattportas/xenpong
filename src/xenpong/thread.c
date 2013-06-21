@@ -30,12 +30,17 @@ StoreThreadFunction(
 
 NTSTATUS
 StoreThreadCreate(
-    __in PDEVICE_OBJECT DeviceObject
+    __in PDEVICE_OBJECT DeviceObject,
+    __out PXENPONG_THREAD *StoreThread
     )
 {
     HANDLE Handle;
-    PKTHREAD Thread;
     NTSTATUS status;
+
+    (*StoreThread) = __ThreadAlloacte(sizeof (XENPONG_THREAD));
+    (*StoreThread)->Context = DeviceObject;
+
+    KeInitializeEvent(&(*StoreThread)->Event, NotificationEvent, FALSE);
 
     status = PsCreateSystemThread(&Handle,
                                   STANDARD_RIGHTS_ALL | SPECIFIC_RIGHTS_ALL,
@@ -43,7 +48,7 @@ StoreThreadCreate(
                                   NULL,
                                   NULL,
                                   StoreThreadFunction,
-                                  DeviceObject);
+                                  *StoreThread);
     if (!NT_SUCCESS(status)) {
         return status;
     }
@@ -52,7 +57,7 @@ StoreThreadCreate(
                                        SYNCHRONIZE,
                                        *PsThreadType,
                                        KernelMode,
-                                       &Thread,
+                                       &(*StoreThread)->Thread,
                                        NULL);
 
     ZwClose(Handle);
