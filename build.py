@@ -33,12 +33,12 @@ class msbuild_failure(Exception):
         return repr(self.value)
 
 def msbuild(name, arch, debug):
-    cwd = os.getcwd()
     configuration = get_configuration(debug)
     os.environ['CONFIGURATION'] = configuration
 
     set_platform(arch)
 
+    cwd = os.getcwd()
     os.chdir('proj')
     status = shell('msbuild.bat')
     os.chdir(cwd)
