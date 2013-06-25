@@ -61,10 +61,7 @@ def msbuild(name, arch, debug):
 
     os.environ['SOLUTION'] = name
 
-    if arch == 'x86':
-        os.environ['PLATFORM'] = 'Win32'
-    elif arch == 'x64':
-        os.environ['PLATFORM'] = 'x64'
+    set_platform(arch)
 
     os.environ['CONFIGURATION'] = configuration
     os.environ['TARGET'] = 'Build'
@@ -76,6 +73,11 @@ def msbuild(name, arch, debug):
     if (status != None):
         raise msbuild_failure(configuration)
 
+def set_platform(arch):
+    if arch == 'x86':
+        os.environ['PLATFORM'] = 'Win32'
+    elif arch == 'x64':
+        os.environ['PLATFORM'] = 'x64'
 
 def callfnout(cmd):
     print(cmd)
