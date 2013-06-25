@@ -18,13 +18,13 @@ def shell(command):
     print(command)
     sys.stdout.flush()
 
-    pipe = os.popen(command, 'r', 1)
+    process = subprocess.Popen(command, shell=True, bufsize=1, stdout=subprocess.PIPE)
 
-    for line in pipe:
-        print(line.rstrip())
-
-    return pipe.close()
-
+    with process.stdout as pipe:
+        for line in pipe:
+            line = line.decode("utf-8")
+            line = line.strip()
+            print(line)
 
 class msbuild_failure(Exception):
     def __init__(self, value):
