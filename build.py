@@ -89,18 +89,6 @@ def callfnout(cmd):
     print("------------------------------------------------------------")
     return output.decode('utf-8')
 
-def archive(filename, files, tgz=False):
-    access='w'
-    if tgz:
-        access='w:gz'
-    with tarfile.open(filename, access) as tar:
-        for name in files:
-            try:
-                print('adding ' + name)
-                tar.add(name)
-            except:
-                pass
-
 def main(debug):
 
     set_version()
@@ -120,6 +108,18 @@ def main(debug):
 def archive_source():
     cmd = ['git', 'archive', '--format=tar.gz', '--prefix=source/', '-o', 'xenpong\\source.tgz', 'master']
     callfnout(cmd)
+
+def archive(filename, files, tgz=False):
+    access='w'
+    if tgz:
+        access='w:gz'
+    with tarfile.open(filename, access) as tar:
+        for name in files:
+            try:
+                print('adding ' + name)
+                tar.add(name)
+            except:
+                pass
 
 def set_version():
     os.environ['MAJOR_VERSION'] = '7'
