@@ -78,7 +78,7 @@ def main(debug):
     msbuild('xenpong', 'x86', debug)
     msbuild('xenpong', 'x64', debug)
 
-    archive_source()
+#    archive_source()
     archive('xenpong.tar', ['xenpong', 'revision'])
 
 def archive_source():
