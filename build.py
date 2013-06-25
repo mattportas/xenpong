@@ -121,7 +121,5 @@ if __name__ == '__main__':
     msbuild('xenpong', 'x86', debug[sys.argv[1]])
     msbuild('xenpong', 'x64', debug[sys.argv[1]])
 
-
-#    listfile = callfnout(['hg','manifest'])
-#    archive('xenpong\\source.tgz', listfile.splitlines(), tgz=True)
+    callfnout(['git', 'archive', '--format=tar.gz', '--prefix=source/', '-o', 'xenpong\\source.tgz', 'master'])
     archive('xenpong.tar', ['xenpong', 'revision'])
