@@ -93,14 +93,13 @@ def archive(filename, files, tgz=False):
     access='w'
     if tgz:
         access='w:gz'
-    tar = tarfile.open(filename, access)
-    for name in files:
-        try:
-            print('adding ' + name)
-            tar.add(name)
-        except:
-            pass
-    tar.close()
+    with tarfile.open(filename, access) as tar:
+        for name in files:
+            try:
+                print('adding ' + name)
+                tar.add(name)
+            except:
+                pass
 
 def main(debug):
 
