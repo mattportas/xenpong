@@ -102,6 +102,15 @@ def archive(filename, files, tgz=False):
             pass
     tar.close()
 
+def set_version():
+    os.environ['MAJOR_VERSION'] = '7'
+    os.environ['MINOR_VERSION'] = '0'
+    os.environ['MICRO_VERSION'] = '0'
+
+def set_build_number():
+    if 'BUILD_NUMBER' not in os.environ.keys():
+        os.environ['BUILD_NUMBER'] = '0'
+
 def print_usage_and_exit():
     print ("Usage: %s <checked|free>" % (sys.argv[0], ))
     sys.exit(1)
@@ -118,12 +127,8 @@ if __name__ == '__main__':
     else:
         print_usage_and_exit()
 
-    os.environ['MAJOR_VERSION'] = '7'
-    os.environ['MINOR_VERSION'] = '0'
-    os.environ['MICRO_VERSION'] = '0'
-
-    if 'BUILD_NUMBER' not in os.environ.keys():
-        os.environ['BUILD_NUMBER'] = '0'
+    set_version()
+    set_build_number()
 
     if 'MERCURIAL_REVISION' in os.environ.keys():
         revision = open('revision', 'w')
