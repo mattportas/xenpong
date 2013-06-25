@@ -58,13 +58,9 @@ class msbuild_failure(Exception):
 def msbuild(name, arch, debug):
     cwd = os.getcwd()
     configuration = get_configuration(debug)
-
-    os.environ['SOLUTION'] = name
+    os.environ['CONFIGURATION'] = configuration
 
     set_platform(arch)
-
-    os.environ['CONFIGURATION'] = configuration
-    os.environ['TARGET'] = 'Build'
 
     os.chdir('proj')
     status = shell('msbuild.bat')
@@ -95,6 +91,7 @@ def main(debug):
 
     set_version()
     set_build_number()
+    set_build_variable("xenpong")
 
     if 'MERCURIAL_REVISION' in os.environ.keys():
         revision = open('revision', 'w')
@@ -131,6 +128,10 @@ def set_version():
 def set_build_number():
     if 'BUILD_NUMBER' not in os.environ.keys():
         os.environ['BUILD_NUMBER'] = '0'
+
+def set_build_variable(name):
+    os.environ['TARGET'] = 'Build'
+    os.environ['SOLUTION'] = name
 
 def print_usage_and_exit():
     print ("Usage: %s <checked|free>" % (sys.argv[0], ))
