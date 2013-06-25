@@ -102,8 +102,22 @@ def archive(filename, files, tgz=False):
             pass
     tar.close()
 
+def print_usage_and_exit():
+    print ("Usage: %s <checked|free>" % (sys.argv[0], ))
+    sys.exit(1)
 
 if __name__ == '__main__':
+
+    if len(sys.argv) < 2:
+        print_usage_and_exit()
+
+    if sys.argv[1] == "checked":
+        debug = True
+    elif sys.argv[1] == "free":
+        debug = False
+    else:
+        print_usage_and_exit()
+
     os.environ['MAJOR_VERSION'] = '7'
     os.environ['MINOR_VERSION'] = '0'
     os.environ['MICRO_VERSION'] = '0'
@@ -116,10 +130,8 @@ if __name__ == '__main__':
         print(os.environ['MERCURIAL_REVISION'], file=revision)
         revision.close()
 
-    debug = { 'checked': True, 'free': False }
-
-    msbuild('xenpong', 'x86', debug[sys.argv[1]])
-    msbuild('xenpong', 'x64', debug[sys.argv[1]])
+    msbuild('xenpong', 'x86', debug)
+    msbuild('xenpong', 'x64', debug)
 
     callfnout(['git', 'archive', '--format=tar.gz', '--prefix=source/', '-o', 'xenpong\\source.tgz', 'master'])
     archive('xenpong.tar', ['xenpong', 'revision'])
