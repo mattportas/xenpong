@@ -1,21 +1,8 @@
 #!python -u
 
 import os, sys
-import datetime
-import re
-import glob
 import tarfile
 import subprocess
-
-def get_configuration_name(debug):
-    configuration = 'WindowsVista'
-
-    if debug:
-        configuration += 'Debug'
-    else:
-        configuration += 'Release'
-
-    return configuration
 
 def get_configuration(debug):
     configuration = 'Windows Vista'
@@ -26,16 +13,6 @@ def get_configuration(debug):
         configuration += ' Release'
 
     return configuration
-
-
-def get_target_path(arch, debug):
-    configuration = get_configuration_name(debug)
-
-    target = { 'x86': 'proj', 'x64': os.sep.join(['proj', 'x64']) }
-    target_path = os.sep.join([target[arch], configuration])
-
-    return target_path
-
 
 def shell(command):
     print(command)
