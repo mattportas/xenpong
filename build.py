@@ -102,6 +102,22 @@ def archive(filename, files, tgz=False):
             pass
     tar.close()
 
+def main(debug):
+
+    set_version()
+    set_build_number()
+
+    if 'MERCURIAL_REVISION' in os.environ.keys():
+        revision = open('revision', 'w')
+        print(os.environ['MERCURIAL_REVISION'], file=revision)
+        revision.close()
+
+    msbuild('xenpong', 'x86', debug)
+    msbuild('xenpong', 'x64', debug)
+
+    callfnout(['git', 'archive', '--format=tar.gz', '--prefix=source/', '-o', 'xenpong\\source.tgz', 'master'])
+    archive('xenpong.tar', ['xenpong', 'revision'])
+
 def set_version():
     os.environ['MAJOR_VERSION'] = '7'
     os.environ['MINOR_VERSION'] = '0'
@@ -127,16 +143,4 @@ if __name__ == '__main__':
     else:
         print_usage_and_exit()
 
-    set_version()
-    set_build_number()
-
-    if 'MERCURIAL_REVISION' in os.environ.keys():
-        revision = open('revision', 'w')
-        print(os.environ['MERCURIAL_REVISION'], file=revision)
-        revision.close()
-
-    msbuild('xenpong', 'x86', debug)
-    msbuild('xenpong', 'x64', debug)
-
-    callfnout(['git', 'archive', '--format=tar.gz', '--prefix=source/', '-o', 'xenpong\\source.tgz', 'master'])
-    archive('xenpong.tar', ['xenpong', 'revision'])
+    main(debug)
