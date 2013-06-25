@@ -115,8 +115,12 @@ def main(debug):
     msbuild('xenpong', 'x86', debug)
     msbuild('xenpong', 'x64', debug)
 
-    callfnout(['git', 'archive', '--format=tar.gz', '--prefix=source/', '-o', 'xenpong\\source.tgz', 'master'])
+    archive_source()
     archive('xenpong.tar', ['xenpong', 'revision'])
+
+def archive_source():
+    cmd = ['git', 'archive', '--format=tar.gz', '--prefix=source/', '-o', 'xenpong\\source.tgz', 'master']
+    callfnout(cmd)
 
 def set_version():
     os.environ['MAJOR_VERSION'] = '7'
