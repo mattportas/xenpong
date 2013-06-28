@@ -1,5 +1,5 @@
-#if !defined(_XENIFACE_H_)
-#define _XENIFACE_H_
+#if !defined(_XENPONG_H_)
+#define _XENPONG_H_
 
 #include <ntddk.h>
 
@@ -60,4 +60,4 @@ QueryEvtchnInterface(
     __in PDEVICE_OBJECT DeviceObject
     );
 
-#endif  // _XENIFACE_H_
+#endif  // _XENPONG_H_
