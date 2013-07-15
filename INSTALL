@@ -1,0 +1,9 @@
+This driver relies upon the win-xenbus driver.
+
+To install this driver onto a XenServer Windows guest VM:
+
+* Insure the xenbus.sys driver is installed,
+* Add "PONG" to the registry value "SupportedClasses" under "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\services\xenbus\Parameters",
+* Add "PONG" to the registry value "SyntheticClasses" under "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\services\xenbus\Parameters",
+* Copy the xenpong.sys, xenpong.inf, xenpong.cat, xenpong.pdb and dpinst.exe to the guest VM,
+* Run dpinst.exe as administrator on the guest VM.
