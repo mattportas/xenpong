@@ -31,7 +31,7 @@ VS location of visual studio
 Commands to build
 -----------------
 
-    git clone http://github.com/xenserver/win-xeniface
+    git clone http://github.com/perf101/xenpong
     cd win-xeniface 
     .\\build.py [checked | free]
 
